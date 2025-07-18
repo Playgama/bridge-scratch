@@ -124,6 +124,10 @@
 
                     // device
                     {
+                        blockType: Scratch.BlockType.LABEL,
+                        text: 'Device'
+                    },
+                    {
                         opcode: 'deviceType',
                         blockType: Scratch.BlockType.REPORTER,
                         text: 'device type'
@@ -233,6 +237,11 @@
                         text: 'Advertisement'
                     },
                     {
+                        opcode: 'advertisementIsInterstitialSupported',
+                        blockType: Scratch.BlockType.BOOLEAN,
+                        text: 'is interstitial supported?',
+                    },
+                    {
                         opcode: 'advertisementShowInterstitial',
                         blockType: Scratch.BlockType.COMMAND,
                         text: 'show interstitial placement [PLACEMENT]',
@@ -292,6 +301,11 @@
                         isEdgeActivated: false
                     },
                     '---',
+                    {
+                        opcode: 'advertisementIsRewardedSupported',
+                        blockType: Scratch.BlockType.BOOLEAN,
+                        text: 'is rewarded supported?',
+                    },
                     {
                         opcode: 'advertisementShowRewarded',
                         blockType: Scratch.BlockType.COMMAND,
