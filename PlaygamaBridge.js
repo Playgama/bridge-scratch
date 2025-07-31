@@ -505,7 +505,7 @@
 
         // common
         initialize() {
-            if (bridge) {
+            if (window.bridge) {
                 return Promise.resolve()
             }
 
@@ -515,12 +515,12 @@
                 document.head.appendChild(script)
 
                 script.onload = () => {
-                    bridge.initialize({ disableLoadingLogo: true })
+                    window.bridge.initialize({ disableLoadingLogo: true })
                         .finally(() => {
                             this._fireEvent('whenInitialized')
                             resolve()
 
-                            bridge.game.on('visibility_state_changed', (state) => {
+                            window.bridge.game.on('visibility_state_changed', (state) => {
                                 switch (state) {
                                     case 'visible':
                                         this._fireEvent('gameWhenVisibilityStateVisible')
@@ -531,7 +531,7 @@
                                 }
                             })
 
-                            bridge.advertisement.on('interstitial_state_changed', (state) => {
+                            window.bridge.advertisement.on('interstitial_state_changed', (state) => {
                                 switch (state) {
                                     case 'loading':
                                         this._fireEvent('advertisementWhenInterstitialStateLoading')
@@ -548,7 +548,7 @@
                                 }
                             })
 
-                            bridge.advertisement.on('rewarded_state_changed', (state) => {
+                            window.bridge.advertisement.on('rewarded_state_changed', (state) => {
                                 switch (state) {
                                     case 'loading':
                                         this._fireEvent('advertisementWhenRewardedStateLoading')
@@ -568,7 +568,7 @@
                                 }
                             })
 
-                            bridge.advertisement.on('banner_state_changed', (state) => {
+                            window.bridge.advertisement.on('banner_state_changed', (state) => {
                                 switch (state) {
                                     case 'loading':
                                         this._fireEvent('advertisementWhenBannerStateLoading')
@@ -585,7 +585,7 @@
                                 }
                             })
 
-                            bridge.platform.on('audio_state_changed', (isEnabled) => {
+                            window.bridge.platform.on('audio_state_changed', (isEnabled) => {
                                 if (isEnabled) {
                                     this._fireEvent('platformWhenAudioEnabled')
                                 } else {
@@ -593,7 +593,7 @@
                                 }
                             })
 
-                            bridge.platform.on('paused_state_changed', (isPaused) => {
+                            window.bridge.platform.on('paused_state_changed', (isPaused) => {
                                 if (isPaused) {
                                     this._fireEvent('platformWhenPaused')
                                 } else {
@@ -610,11 +610,11 @@
         }
 
         isInitialized() {
-            if (!bridge) {
+            if (!window.bridge) {
                 return false
             }
 
-            return bridge.isInitialized
+            return window.bridge.isInitialized
         }
 
 
@@ -624,7 +624,7 @@
                 return
             }
 
-            return bridge.platform.sendMessage(args.MESSAGE)
+            return window.bridge.platform.sendMessage(args.MESSAGE)
         }
 
         platformId() {
@@ -632,7 +632,7 @@
                 return ''
             }
 
-            return bridge.platform.id
+            return window.bridge.platform.id
         }
 
         platformLanguage() {
@@ -640,7 +640,7 @@
                 return ''
             }
 
-            return bridge.platform.language
+            return window.bridge.platform.language
         }
 
         platformTld() {
@@ -648,7 +648,7 @@
                 return ''
             }
 
-            return bridge.platform.tld
+            return window.bridge.platform.tld
         }
 
         platformPayload() {
@@ -656,7 +656,7 @@
                 return ''
             }
 
-            return bridge.platform.payload
+            return window.bridge.platform.payload
         }
 
         platformIsAudioEnabled() {
@@ -664,7 +664,7 @@
                 return false
             }
 
-            return bridge.platform.isAudioEnabled
+            return window.bridge.platform.isAudioEnabled
         }
 
         platformIsPaused() {
@@ -672,7 +672,7 @@
                 return false
             }
 
-            return bridge.platform.isPaused
+            return window.bridge.platform.isPaused
         }
 
 
@@ -682,7 +682,7 @@
                 return ''
             }
 
-            return bridge.game.visibilityState
+            return window.bridge.game.visibilityState
         }
 
         gameVisibilityStateIsVisible() {
@@ -700,7 +700,7 @@
                 return ''
             }
 
-            return bridge.device.type
+            return window.bridge.device.type
         }
 
         deviceTypeIsDesktop() {
@@ -726,7 +726,7 @@
                 return ''
             }
 
-            return bridge.storage.defaultType
+            return window.bridge.storage.defaultType
         }
 
         storageIsLocalStorageAvailable() {
@@ -734,7 +734,7 @@
                 return false
             }
 
-            return bridge.storage.isAvailable('local_storage')
+            return window.bridge.storage.isAvailable('local_storage')
         }
 
         storageIsLocalStorageSupported() {
@@ -742,7 +742,7 @@
                 return false
             }
 
-            return bridge.storage.isSupported('local_storage')
+            return window.bridge.storage.isSupported('local_storage')
         }
 
         storageIsPlatformInternalAvailable() {
@@ -750,7 +750,7 @@
                 return false
             }
 
-            return bridge.storage.isAvailable('platform_internal')
+            return window.bridge.storage.isAvailable('platform_internal')
         }
 
         storageIsPlatformInternalSupported() {
@@ -758,7 +758,7 @@
                 return false
             }
 
-            return bridge.storage.isSupported('platform_internal')
+            return window.bridge.storage.isSupported('platform_internal')
         }
 
         storageSet(args) {
@@ -767,10 +767,10 @@
             }
 
             if (args.STORAGE_TYPE === 'default') {
-                return bridge.storage.set(args.KEY, args.VALUE)
+                return window.bridge.storage.set(args.KEY, args.VALUE)
             }
 
-            return bridge.storage.set(args.KEY, args.VALUE, args.STORAGE_TYPE)
+            return window.bridge.storage.set(args.KEY, args.VALUE, args.STORAGE_TYPE)
         }
 
         storageGet(args) {
@@ -779,10 +779,10 @@
             }
 
             if (args.STORAGE_TYPE === 'default') {
-                return bridge.storage.get(args.KEY)
+                return window.bridge.storage.get(args.KEY)
             }
 
-            return bridge.storage.get(args.KEY, args.STORAGE_TYPE)
+            return window.bridge.storage.get(args.KEY, args.STORAGE_TYPE)
         }
 
         storageDelete(args) {
@@ -791,10 +791,10 @@
             }
 
             if (args.STORAGE_TYPE === 'default') {
-                return bridge.storage.delete(args.KEY)
+                return window.bridge.storage.delete(args.KEY)
             }
 
-            bridge.storage.delete(args.KEY, args.STORAGE_TYPE)
+            window.bridge.storage.delete(args.KEY, args.STORAGE_TYPE)
         }
 
 
@@ -804,7 +804,7 @@
                 return
             }
 
-            bridge.advertisement.showInterstitial(args.PLACEMENT)
+            window.bridge.advertisement.showInterstitial(args.PLACEMENT)
         }
 
         advertisementInterstitialState() {
@@ -812,7 +812,7 @@
                 return ''
             }
 
-            return bridge.advertisement.interstitialState
+            return window.bridge.advertisement.interstitialState
         }
 
         advertisementIsInterstitialStateLoading() {
@@ -837,7 +837,7 @@
                 return
             }
 
-            bridge.advertisement.showRewarded(args.PLACEMENT)
+            window.bridge.advertisement.showRewarded(args.PLACEMENT)
         }
 
         advertisementRewardedState() {
@@ -845,7 +845,7 @@
                 return ''
             }
 
-            return bridge.advertisement.rewardedState
+            return window.bridge.advertisement.rewardedState
         }
 
         advertisementIsRewardedStateLoading() {
@@ -874,7 +874,7 @@
                 return false
             }
 
-            return bridge.advertisement.isBannerSupported
+            return window.bridge.advertisement.isBannerSupported
         }
 
         advertisementShowBanner(args) {
@@ -882,7 +882,7 @@
                 return
             }
 
-            bridge.advertisement.showBanner(args.POSITION, args.PLACEMENT)
+            window.bridge.advertisement.showBanner(args.POSITION, args.PLACEMENT)
         }
 
         advertisementHideBanner() {
@@ -890,7 +890,7 @@
                 return
             }
 
-            bridge.advertisement.hideBanner()
+            window.bridge.advertisement.hideBanner()
         }
 
         advertisementBannerState() {
@@ -898,7 +898,7 @@
                 return ''
             }
 
-            return bridge.advertisement.bannerState
+            return window.bridge.advertisement.bannerState
         }
 
         advertisementIsBannerStateLoading() {
@@ -923,7 +923,7 @@
         }
 
         _canUseBridge() {
-            return bridge && bridge.isInitialized
+            return window.bridge && window.bridge.isInitialized
         }
     }
     Scratch.extensions.register(new PlaygamaBridge())
