@@ -515,6 +515,7 @@
                 document.head.appendChild(script)
 
                 script.onload = () => {
+                    window.bridge.engine = 'scratch'
                     window.bridge.initialize({ disableLoadingLogo: true })
                         .finally(() => {
                             this._fireEvent('whenInitialized')
