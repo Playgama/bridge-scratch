@@ -63,6 +63,21 @@
                         }
                     },
                     {
+                        opcode: 'platformSendCustomMessage',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'send custom message [ID] to platform with data [DATA]',
+                        arguments: {
+                            ID: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            DATA: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            }
+                        }
+                    },
+                    {
                         opcode: 'platformId',
                         blockType: Scratch.BlockType.REPORTER,
                         text: 'platform id'
@@ -675,6 +690,23 @@
             if (args.LEVEL !== '') options.level = args.LEVEL
 
             return window.bridge.platform.sendMessage(args.MESSAGE, options)
+        }
+
+        platformSendCustomMessage(args) {
+            if (!this._canUseBridge()) {
+                return
+            }
+
+            let options
+            if (args.DATA !== '') {
+                try {
+                    options = JSON.parse(args.DATA)
+                } catch (e) {
+                    options = undefined
+                }
+            }
+
+            return window.bridge.platform.sendCustomMessage(args.ID, options)
         }
 
         platformId() {
