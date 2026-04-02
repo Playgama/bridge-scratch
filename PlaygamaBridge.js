@@ -493,6 +493,32 @@
                         text: 'when banner hidden',
                         isEdgeActivated: false
                     },
+                    '---',
+                    {
+                        opcode: 'advertisementIsAdvancedBannersSupported',
+                        blockType: Scratch.BlockType.BOOLEAN,
+                        text: 'is advanced banners supported?',
+                    },
+                    {
+                        opcode: 'advertisementShowAdvancedBanners',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'show advanced banners, placement [PLACEMENT]',
+                        arguments: {
+                            PLACEMENT: {
+                                type: Scratch.ArgumentType.STRING
+                            }
+                        }
+                    },
+                    {
+                        opcode: 'advertisementHideAdvancedBanners',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'hide advanced banners'
+                    },
+                    {
+                        opcode: 'advertisementAdvancedBannersState',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'advanced banners state',
+                    },
                 ],
                 menus: {
                     PLATFORM_MESSAGE: {
@@ -997,6 +1023,39 @@
 
         advertisementIsBannerStateHidden() {
             return this.advertisementBannerState() === 'hidden'
+        }
+
+
+        advertisementIsAdvancedBannersSupported() {
+            if (!this._canUseBridge()) {
+                return false
+            }
+
+            return window.bridge.advertisement.isAdvancedBannersSupported
+        }
+
+        advertisementShowAdvancedBanners(args) {
+            if (!this._canUseBridge()) {
+                return
+            }
+
+            window.bridge.advertisement.showAdvancedBanners(args.PLACEMENT)
+        }
+
+        advertisementHideAdvancedBanners() {
+            if (!this._canUseBridge()) {
+                return
+            }
+
+            window.bridge.advertisement.hideAdvancedBanners()
+        }
+
+        advertisementAdvancedBannersState() {
+            if (!this._canUseBridge()) {
+                return ''
+            }
+
+            return window.bridge.advertisement.advancedBannersState
         }
 
 
