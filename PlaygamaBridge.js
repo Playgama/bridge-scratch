@@ -670,9 +670,11 @@
                     if (bridgeScript && bridgeScript.parentNode) {
                         bridgeScript.onload = null
                         bridgeScript.onerror = null
-                        bridgeScript.src = ''
                         bridgeScript.parentNode.removeChild(bridgeScript)
                     }
+
+                    window.bridge = null
+                    window.playgamaBridge = null
 
                     evalLocalScript()
                 }
