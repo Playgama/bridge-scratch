@@ -132,39 +132,6 @@
                         isEdgeActivated: false
                     },
 
-                    // game
-                    {
-                        blockType: Scratch.BlockType.LABEL,
-                        text: 'Game'
-                    },
-                    {
-                        opcode: 'gameVisibilityState',
-                        blockType: Scratch.BlockType.REPORTER,
-                        text: 'game visibility state'
-                    },
-                    {
-                        opcode: 'gameVisibilityStateIsVisible',
-                        blockType: Scratch.BlockType.BOOLEAN,
-                        text: 'game is visible?'
-                    },
-                    {
-                        opcode: 'gameVisibilityStateIsHidden',
-                        blockType: Scratch.BlockType.BOOLEAN,
-                        text: 'game is hidden?'
-                    },
-                    {
-                        opcode: 'gameWhenVisibilityStateVisible',
-                        blockType: Scratch.BlockType.EVENT,
-                        text: 'when game visible',
-                        isEdgeActivated: false
-                    },
-                    {
-                        opcode: 'gameWhenVisibilityStateHidden',
-                        blockType: Scratch.BlockType.EVENT,
-                        text: 'when game hidden',
-                        isEdgeActivated: false
-                    },
-
                     // device
                     {
                         blockType: Scratch.BlockType.LABEL,
@@ -531,17 +498,6 @@
                             self._fireEvent('whenInitialized')
                             resolve()
 
-                            window.bridge.game.on('visibility_state_changed', (state) => {
-                                switch (state) {
-                                    case 'visible':
-                                        self._fireEvent('gameWhenVisibilityStateVisible')
-                                        break
-                                    case 'hidden':
-                                        self._fireEvent('gameWhenVisibilityStateHidden')
-                                        break
-                                }
-                            })
-
                             window.bridge.advertisement.on('interstitial_state_changed', (state) => {
                                 switch (state) {
                                     case 'loading':
@@ -736,24 +692,6 @@
             }
 
             return window.bridge.platform.isPaused
-        }
-
-
-        // game
-        gameVisibilityState() {
-            if (!this._canUseBridge()) {
-                return ''
-            }
-
-            return window.bridge.game.visibilityState
-        }
-
-        gameVisibilityStateIsVisible() {
-            return this.gameVisibilityState() === 'visible'
-        }
-
-        gameVisibilityStateIsHidden() {
-            return this.gameVisibilityState() === 'hidden'
         }
 
 
