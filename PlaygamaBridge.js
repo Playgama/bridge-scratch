@@ -565,7 +565,7 @@
                                 }
                             })
 
-                            window.bridge.platform.on('paused_state_changed', (isPaused) => {
+                            window.bridge.platform.on('pause_state_changed', (isPaused) => {
                                 if (isPaused) {
                                     self._fireEvent('platformWhenPaused')
                                 } else {
