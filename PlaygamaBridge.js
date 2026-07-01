@@ -910,6 +910,14 @@
 
 
         // advertisement
+        advertisementIsInterstitialSupported() {
+            if (!this._canUseBridge()) {
+                return false
+            }
+
+            return window.bridge.advertisement.isInterstitialSupported
+        }
+
         advertisementShowInterstitial(args) {
             if (!this._canUseBridge()) {
                 return
@@ -942,6 +950,14 @@
             return this.advertisementInterstitialState() === 'closed'
         }
 
+
+        advertisementIsRewardedSupported() {
+            if (!this._canUseBridge()) {
+                return false
+            }
+
+            return window.bridge.advertisement.isRewardedSupported
+        }
 
         advertisementShowRewarded(args) {
             if (!this._canUseBridge()) {
