@@ -295,6 +295,22 @@
                         }
                     },
                     {
+                        opcode: 'advertisementSetMinimumDelayBetweenInterstitial',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'set interstitial cooldown to [SECONDS] seconds',
+                        arguments: {
+                            SECONDS: {
+                                type: Scratch.ArgumentType.NUMBER,
+                                defaultValue: 60
+                            }
+                        }
+                    },
+                    {
+                        opcode: 'advertisementMinimumDelayBetweenInterstitial',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'interstitial cooldown',
+                    },
+                    {
                         opcode: 'advertisementInterstitialState',
                         blockType: Scratch.BlockType.REPORTER,
                         text: 'interstitial state',
@@ -924,6 +940,22 @@
             }
 
             window.bridge.advertisement.showInterstitial(args.PLACEMENT)
+        }
+
+        advertisementSetMinimumDelayBetweenInterstitial(args) {
+            if (!this._canUseBridge()) {
+                return
+            }
+
+            window.bridge.advertisement.setMinimumDelayBetweenInterstitial(args.SECONDS)
+        }
+
+        advertisementMinimumDelayBetweenInterstitial() {
+            if (!this._canUseBridge()) {
+                return 0
+            }
+
+            return window.bridge.advertisement.minimumDelayBetweenInterstitial
         }
 
         advertisementInterstitialState() {
