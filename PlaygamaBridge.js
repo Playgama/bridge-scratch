@@ -453,6 +453,27 @@
                         blockType: Scratch.BlockType.REPORTER,
                         text: 'advanced banners state',
                     },
+
+                    // analytics
+                    {
+                        blockType: Scratch.BlockType.LABEL,
+                        text: 'Analytics'
+                    },
+                    {
+                        opcode: 'analyticsSend',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'send analytics event [EVENT_NAME] with data [DATA]',
+                        arguments: {
+                            EVENT_NAME: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            DATA: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            }
+                        }
+                    },
                 ],
                 menus: {
                     PLATFORM_MESSAGE: {
@@ -912,6 +933,27 @@
             }
 
             return window.bridge.advertisement.advancedBannersState
+        }
+
+
+        // analytics
+        // The event name and the data are entirely up to the game — they are
+        // never matched against the SDK's own event names.
+        analyticsSend(args) {
+            if (!this._canUseBridge()) {
+                return
+            }
+
+            let data
+            if (args.DATA !== '') {
+                try {
+                    data = JSON.parse(args.DATA)
+                } catch (e) {
+                    data = undefined
+                }
+            }
+
+            window.bridge.analytics.send(args.EVENT_NAME, data)
         }
 
 
