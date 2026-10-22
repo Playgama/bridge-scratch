@@ -11,6 +11,16 @@
 
     class PlaygamaBridge {
 
+        constructor() {
+            // multiplayer data exposed through reporters
+            this._multiplayerLastError = ''
+            this._multiplayerLastRooms = []
+            this._multiplayerLastPlayer = null
+            this._multiplayerLastMessage = null
+            this._multiplayerRoomLeftReason = ''
+            this._multiplayerEventQueue = []
+        }
+
         getInfo() {
             return {
                 id: ID,
@@ -474,6 +484,333 @@
                             }
                         }
                     },
+
+                    // multiplayer
+                    {
+                        blockType: Scratch.BlockType.LABEL,
+                        text: 'Multiplayer'
+                    },
+                    {
+                        opcode: 'multiplayerIsSupported',
+                        blockType: Scratch.BlockType.BOOLEAN,
+                        text: 'is multiplayer supported?'
+                    },
+                    {
+                        opcode: 'multiplayerState',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer state'
+                    },
+                    {
+                        opcode: 'multiplayerIsInRoom',
+                        blockType: Scratch.BlockType.BOOLEAN,
+                        text: 'is in multiplayer room?'
+                    },
+                    {
+                        opcode: 'multiplayerIsHost',
+                        blockType: Scratch.BlockType.BOOLEAN,
+                        text: 'is multiplayer host?'
+                    },
+                    {
+                        opcode: 'multiplayerPlayerId',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer player id'
+                    },
+                    {
+                        opcode: 'multiplayerHostId',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer host id'
+                    },
+                    {
+                        opcode: 'multiplayerRoomId',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer room id'
+                    },
+                    {
+                        opcode: 'multiplayerRoom',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer room JSON'
+                    },
+                    {
+                        opcode: 'multiplayerPlayers',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer players JSON'
+                    },
+                    {
+                        opcode: 'multiplayerIsInviteSupported',
+                        blockType: Scratch.BlockType.BOOLEAN,
+                        text: 'is multiplayer invite supported?'
+                    },
+                    {
+                        opcode: 'multiplayerLaunchRoomId',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer launch room id'
+                    },
+                    {
+                        opcode: 'multiplayerLastError',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer last error'
+                    },
+                    {
+                        opcode: 'multiplayerWhenStateChanged',
+                        blockType: Scratch.BlockType.EVENT,
+                        text: 'when multiplayer state changed',
+                        isEdgeActivated: false
+                    },
+                    '---',
+                    {
+                        opcode: 'multiplayerCreateRoom',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'create multiplayer room, max players [MAX_PLAYERS], visible [IS_VISIBLE], properties [PROPERTIES], player name [PLAYER_NAME], player properties [PLAYER_PROPERTIES]',
+                        arguments: {
+                            MAX_PLAYERS: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            IS_VISIBLE: {
+                                type: Scratch.ArgumentType.STRING,
+                                menu: 'MULTIPLAYER_BOOLEAN',
+                                defaultValue: 'false'
+                            },
+                            PROPERTIES: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            PLAYER_NAME: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            PLAYER_PROPERTIES: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            }
+                        }
+                    },
+                    {
+                        opcode: 'multiplayerJoinRoom',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'join multiplayer room [ROOM_ID], player name [PLAYER_NAME], player properties [PLAYER_PROPERTIES]',
+                        arguments: {
+                            ROOM_ID: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            PLAYER_NAME: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            PLAYER_PROPERTIES: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            }
+                        }
+                    },
+                    {
+                        opcode: 'multiplayerJoinOrCreateRoom',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'join or create multiplayer room, max players [MAX_PLAYERS], filter [FILTER], properties [PROPERTIES], player name [PLAYER_NAME], player properties [PLAYER_PROPERTIES]',
+                        arguments: {
+                            MAX_PLAYERS: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            FILTER: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            PROPERTIES: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            PLAYER_NAME: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            PLAYER_PROPERTIES: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            }
+                        }
+                    },
+                    {
+                        opcode: 'multiplayerLeaveRoom',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'leave multiplayer room'
+                    },
+                    {
+                        opcode: 'multiplayerGetRooms',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'get multiplayer rooms, max players [MAX_PLAYERS], filter [FILTER], limit [LIMIT]',
+                        arguments: {
+                            MAX_PLAYERS: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            FILTER: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            LIMIT: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            }
+                        }
+                    },
+                    {
+                        opcode: 'multiplayerLastRooms',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer last rooms JSON'
+                    },
+                    {
+                        opcode: 'multiplayerInviteToRoom',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'invite to multiplayer room, text [TEXT], image [IMAGE]',
+                        arguments: {
+                            TEXT: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            IMAGE: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            }
+                        }
+                    },
+                    {
+                        opcode: 'multiplayerWhenRoomLeft',
+                        blockType: Scratch.BlockType.EVENT,
+                        text: 'when multiplayer room left',
+                        isEdgeActivated: false
+                    },
+                    {
+                        opcode: 'multiplayerRoomLeftReason',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer room left reason'
+                    },
+                    '---',
+                    {
+                        opcode: 'multiplayerSetRoomOpen',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'set multiplayer room open [IS_OPEN]',
+                        arguments: {
+                            IS_OPEN: {
+                                type: Scratch.ArgumentType.STRING,
+                                menu: 'MULTIPLAYER_BOOLEAN',
+                                defaultValue: 'true'
+                            }
+                        }
+                    },
+                    {
+                        opcode: 'multiplayerSetRoomVisible',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'set multiplayer room visible [IS_VISIBLE]',
+                        arguments: {
+                            IS_VISIBLE: {
+                                type: Scratch.ArgumentType.STRING,
+                                menu: 'MULTIPLAYER_BOOLEAN',
+                                defaultValue: 'true'
+                            }
+                        }
+                    },
+                    {
+                        opcode: 'multiplayerSetRoomProperties',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'set multiplayer room properties [PROPERTIES]',
+                        arguments: {
+                            PROPERTIES: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            }
+                        }
+                    },
+                    {
+                        opcode: 'multiplayerWhenRoomUpdated',
+                        blockType: Scratch.BlockType.EVENT,
+                        text: 'when multiplayer room updated',
+                        isEdgeActivated: false
+                    },
+                    {
+                        opcode: 'multiplayerWhenHostChanged',
+                        blockType: Scratch.BlockType.EVENT,
+                        text: 'when multiplayer host changed',
+                        isEdgeActivated: false
+                    },
+                    '---',
+                    {
+                        opcode: 'multiplayerSetPlayerProperties',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'set multiplayer player properties [PROPERTIES]',
+                        arguments: {
+                            PROPERTIES: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            }
+                        }
+                    },
+                    {
+                        opcode: 'multiplayerWhenPlayerJoined',
+                        blockType: Scratch.BlockType.EVENT,
+                        text: 'when multiplayer player joined',
+                        isEdgeActivated: false
+                    },
+                    {
+                        opcode: 'multiplayerWhenPlayerLeft',
+                        blockType: Scratch.BlockType.EVENT,
+                        text: 'when multiplayer player left',
+                        isEdgeActivated: false
+                    },
+                    {
+                        opcode: 'multiplayerWhenPlayerUpdated',
+                        blockType: Scratch.BlockType.EVENT,
+                        text: 'when multiplayer player updated',
+                        isEdgeActivated: false
+                    },
+                    {
+                        opcode: 'multiplayerLastPlayer',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer last player JSON'
+                    },
+                    '---',
+                    {
+                        opcode: 'multiplayerSend',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'send multiplayer message [TYPE] with data [DATA] to [TARGET]',
+                        arguments: {
+                            TYPE: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            DATA: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            },
+                            TARGET: {
+                                type: Scratch.ArgumentType.STRING,
+                                menu: 'MULTIPLAYER_TARGET',
+                                defaultValue: 'others'
+                            }
+                        }
+                    },
+                    {
+                        opcode: 'multiplayerWhenMessageReceived',
+                        blockType: Scratch.BlockType.EVENT,
+                        text: 'when multiplayer message received',
+                        isEdgeActivated: false
+                    },
+                    {
+                        opcode: 'multiplayerLastMessageType',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer last message type'
+                    },
+                    {
+                        opcode: 'multiplayerLastMessageData',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer last message data'
+                    },
+                    {
+                        opcode: 'multiplayerLastMessageFrom',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer last message from'
+                    },
                 ],
                 menus: {
                     PLATFORM_MESSAGE: {
@@ -497,6 +834,21 @@
                         items: [
                             'bottom',
                             'top'
+                        ]
+                    },
+                    MULTIPLAYER_BOOLEAN: {
+                        acceptReporters: true,
+                        items: [
+                            'true',
+                            'false'
+                        ]
+                    },
+                    MULTIPLAYER_TARGET: {
+                        acceptReporters: true,
+                        items: [
+                            'all',
+                            'others',
+                            'host'
                         ]
                     }
                 }
@@ -593,6 +945,11 @@
                                     self._fireEvent('platformWhenResumed')
                                 }
                             })
+
+                            // The core may be loaded without the multiplayer module
+                            if (window.bridge.multiplayer) {
+                                self._subscribeMultiplayerEvents()
+                            }
                         })
                 })
             }
@@ -973,8 +1330,384 @@
         }
 
 
+        // multiplayer
+        // Objects (room, players, properties) are passed as JSON strings,
+        // empty arguments are omitted from the request options.
+        multiplayerIsSupported() {
+            if (!this._canUseMultiplayer()) {
+                return false
+            }
+
+            return window.bridge.multiplayer.isSupported
+        }
+
+        multiplayerState() {
+            if (!this._canUseMultiplayer()) {
+                return ''
+            }
+
+            return window.bridge.multiplayer.state
+        }
+
+        multiplayerIsInRoom() {
+            if (!this._canUseMultiplayer()) {
+                return false
+            }
+
+            return window.bridge.multiplayer.isInRoom
+        }
+
+        multiplayerIsHost() {
+            if (!this._canUseMultiplayer()) {
+                return false
+            }
+
+            return window.bridge.multiplayer.isHost
+        }
+
+        multiplayerPlayerId() {
+            if (!this._canUseMultiplayer()) {
+                return ''
+            }
+
+            return window.bridge.multiplayer.playerId || ''
+        }
+
+        multiplayerHostId() {
+            if (!this._canUseMultiplayer()) {
+                return ''
+            }
+
+            return window.bridge.multiplayer.hostId || ''
+        }
+
+        multiplayerRoomId() {
+            if (!this._canUseMultiplayer()) {
+                return ''
+            }
+
+            return window.bridge.multiplayer.roomId || ''
+        }
+
+        multiplayerRoom() {
+            if (!this._canUseMultiplayer()) {
+                return ''
+            }
+
+            return this._toJson(window.bridge.multiplayer.room)
+        }
+
+        multiplayerPlayers() {
+            if (!this._canUseMultiplayer()) {
+                return '[]'
+            }
+
+            return this._toJson(window.bridge.multiplayer.players)
+        }
+
+        multiplayerIsInviteSupported() {
+            if (!this._canUseMultiplayer()) {
+                return false
+            }
+
+            return window.bridge.multiplayer.isInviteSupported
+        }
+
+        multiplayerLaunchRoomId() {
+            if (!this._canUseMultiplayer()) {
+                return ''
+            }
+
+            return window.bridge.multiplayer.launchRoomId || ''
+        }
+
+        multiplayerLastError() {
+            return this._multiplayerLastError
+        }
+
+        multiplayerCreateRoom(args) {
+            const options = this._getMultiplayerPlayerOptions(args)
+            const maxPlayers = this._parsePositiveNumber(args.MAX_PLAYERS)
+            if (maxPlayers !== undefined) options.maxPlayers = maxPlayers
+            options.isVisible = Scratch.Cast.toBoolean(args.IS_VISIBLE)
+            const properties = this._parseJsonObject(args.PROPERTIES)
+            if (properties !== undefined) options.properties = properties
+
+            return this._multiplayerRequest(() => window.bridge.multiplayer.createRoom(options))
+        }
+
+        multiplayerJoinRoom(args) {
+            const options = this._getMultiplayerPlayerOptions(args)
+            return this._multiplayerRequest(() => window.bridge.multiplayer.joinRoom(args.ROOM_ID, options))
+        }
+
+        multiplayerJoinOrCreateRoom(args) {
+            const options = this._getMultiplayerPlayerOptions(args)
+            const maxPlayers = this._parsePositiveNumber(args.MAX_PLAYERS)
+            if (maxPlayers !== undefined) options.maxPlayers = maxPlayers
+            const filter = this._parseJsonObject(args.FILTER)
+            if (filter !== undefined) options.filter = filter
+            const properties = this._parseJsonObject(args.PROPERTIES)
+            if (properties !== undefined) options.properties = properties
+
+            return this._multiplayerRequest(() => window.bridge.multiplayer.joinOrCreateRoom(options))
+        }
+
+        multiplayerLeaveRoom() {
+            if (!this._canUseMultiplayer()) {
+                return
+            }
+
+            window.bridge.multiplayer.leaveRoom()
+        }
+
+        multiplayerGetRooms(args) {
+            const options = {}
+            const maxPlayers = this._parsePositiveNumber(args.MAX_PLAYERS)
+            if (maxPlayers !== undefined) options.maxPlayers = maxPlayers
+            const filter = this._parseJsonObject(args.FILTER)
+            if (filter !== undefined) options.filter = filter
+            const limit = this._parsePositiveNumber(args.LIMIT)
+            if (limit !== undefined) options.limit = limit
+
+            this._multiplayerLastRooms = []
+            return this._multiplayerRequest(
+                () => window.bridge.multiplayer.getRooms(options),
+                (rooms) => { this._multiplayerLastRooms = rooms || [] }
+            )
+        }
+
+        multiplayerLastRooms() {
+            return this._toJson(this._multiplayerLastRooms)
+        }
+
+        multiplayerInviteToRoom(args) {
+            const options = {}
+            if (args.TEXT !== '') options.text = args.TEXT
+            if (args.IMAGE !== '') options.image = args.IMAGE
+
+            return this._multiplayerRequest(() => window.bridge.multiplayer.inviteToRoom(options))
+        }
+
+        multiplayerRoomLeftReason() {
+            return this._multiplayerRoomLeftReason
+        }
+
+        multiplayerSetRoomOpen(args) {
+            if (!this._canUseMultiplayer()) {
+                return
+            }
+
+            window.bridge.multiplayer.setRoomOpen(Scratch.Cast.toBoolean(args.IS_OPEN))
+        }
+
+        multiplayerSetRoomVisible(args) {
+            if (!this._canUseMultiplayer()) {
+                return
+            }
+
+            window.bridge.multiplayer.setRoomVisible(Scratch.Cast.toBoolean(args.IS_VISIBLE))
+        }
+
+        multiplayerSetRoomProperties(args) {
+            if (!this._canUseMultiplayer()) {
+                return
+            }
+
+            const properties = this._parseJsonObject(args.PROPERTIES)
+            if (properties === undefined) {
+                return
+            }
+
+            window.bridge.multiplayer.setRoomProperties(properties)
+        }
+
+        multiplayerSetPlayerProperties(args) {
+            if (!this._canUseMultiplayer()) {
+                return
+            }
+
+            const properties = this._parseJsonObject(args.PROPERTIES)
+            if (properties === undefined) {
+                return
+            }
+
+            window.bridge.multiplayer.setPlayerProperties(properties)
+        }
+
+        multiplayerLastPlayer() {
+            return this._toJson(this._multiplayerLastPlayer)
+        }
+
+        // Data is sent as parsed JSON when it is valid JSON, otherwise as a plain string.
+        // The target is 'all', 'others', 'host' or a player id.
+        multiplayerSend(args) {
+            if (!this._canUseMultiplayer()) {
+                return
+            }
+
+            let data
+            if (args.DATA !== '') {
+                try {
+                    data = JSON.parse(args.DATA)
+                } catch (e) {
+                    data = args.DATA
+                }
+            }
+
+            const to = args.TARGET !== '' ? args.TARGET : 'others'
+            window.bridge.multiplayer.send(args.TYPE, data, { to })
+        }
+
+        multiplayerLastMessageType() {
+            return this._multiplayerLastMessage ? this._multiplayerLastMessage.type : ''
+        }
+
+        multiplayerLastMessageData() {
+            if (!this._multiplayerLastMessage) {
+                return ''
+            }
+
+            const data = this._multiplayerLastMessage.data
+            return typeof data === 'string' ? data : this._toJson(data)
+        }
+
+        multiplayerLastMessageFrom() {
+            return this._multiplayerLastMessage ? this._multiplayerLastMessage.from : ''
+        }
+
+        // Runs an async multiplayer call: the block waits for it, a failure is stored
+        // as the error code for the 'multiplayer last error' reporter.
+        _multiplayerRequest(request, onSuccess) {
+            this._multiplayerLastError = ''
+
+            if (!this._canUseMultiplayer()) {
+                this._multiplayerLastError = 'MULTIPLAYER_NOT_SUPPORTED'
+                return
+            }
+
+            return Promise.resolve()
+                .then(request)
+                .then((result) => {
+                    if (onSuccess) {
+                        onSuccess(result)
+                    }
+                })
+                .catch((error) => {
+                    this._multiplayerLastError = (error && (error.code || error.message)) || 'UNKNOWN_ERROR'
+                })
+        }
+
+        _getMultiplayerPlayerOptions(args) {
+            const options = {}
+            if (args.PLAYER_NAME !== '') options.playerName = args.PLAYER_NAME
+            const playerProperties = this._parseJsonObject(args.PLAYER_PROPERTIES)
+            if (playerProperties !== undefined) options.playerProperties = playerProperties
+            return options
+        }
+
+        _parseJsonObject(value) {
+            if (value === '' || value === undefined) {
+                return undefined
+            }
+
+            try {
+                const result = JSON.parse(value)
+                return result && typeof result === 'object' && !Array.isArray(result) ? result : undefined
+            } catch (e) {
+                return undefined
+            }
+        }
+
+        _parsePositiveNumber(value) {
+            if (value === '' || value === undefined) {
+                return undefined
+            }
+
+            const number = Scratch.Cast.toNumber(value)
+            return number > 0 ? Math.floor(number) : undefined
+        }
+
+        _toJson(value) {
+            if (value === null || value === undefined) {
+                return ''
+            }
+
+            try {
+                return JSON.stringify(value)
+            } catch (e) {
+                return ''
+            }
+        }
+
+        // Events are queued and fired at the start of a frame: hats read the event data from
+        // shared reporters, so an event waits while an earlier one of its group is handled
+        _subscribeMultiplayerEvents() {
+            const multiplayer = window.bridge.multiplayer
+            const queue = (hat, group, apply) => this._multiplayerEventQueue.push({ hat, group, apply })
+
+            multiplayer.on('multiplayer_state_changed', () => queue('multiplayerWhenStateChanged', 'state'))
+            multiplayer.on('multiplayer_room_left', (reason) => queue('multiplayerWhenRoomLeft', 'roomLeft', () => {
+                this._multiplayerRoomLeftReason = reason || ''
+            }))
+            multiplayer.on('multiplayer_room_updated', () => queue('multiplayerWhenRoomUpdated', 'room'))
+            multiplayer.on('multiplayer_player_joined', (player) => queue('multiplayerWhenPlayerJoined', 'player', () => {
+                this._multiplayerLastPlayer = player
+            }))
+            multiplayer.on('multiplayer_player_left', (player) => queue('multiplayerWhenPlayerLeft', 'player', () => {
+                this._multiplayerLastPlayer = player
+            }))
+            multiplayer.on('multiplayer_player_updated', (player) => queue('multiplayerWhenPlayerUpdated', 'player', () => {
+                this._multiplayerLastPlayer = player
+            }))
+            multiplayer.on('multiplayer_host_changed', () => queue('multiplayerWhenHostChanged', 'host'))
+            multiplayer.on('multiplayer_message_received', (message) => queue('multiplayerWhenMessageReceived', 'message', () => {
+                this._multiplayerLastMessage = message
+            }))
+
+            Scratch.vm.runtime.on('BEFORE_EXECUTE', () => this._fireMultiplayerEvents())
+        }
+
+        // Fires queued events in order, at most one per group in a frame. An event also waits
+        // while its hat scripts still run: Scratch would not restart them and the event would be lost
+        _fireMultiplayerEvents() {
+            const firedGroups = []
+
+            while (this._multiplayerEventQueue.length > 0) {
+                const event = this._multiplayerEventQueue[0]
+                if (firedGroups.includes(event.group) || this._isHatRunning(event.hat)) {
+                    return
+                }
+
+                this._multiplayerEventQueue.shift()
+
+                if (event.apply) {
+                    event.apply()
+                }
+
+                // Without hat scripts nothing reads the data, the next event of the group can go now
+                const threads = this._fireEvent(event.hat)
+                if (threads && threads.length > 0) {
+                    firedGroups.push(event.group)
+                }
+            }
+        }
+
+        _isHatRunning(name) {
+            const opcode = `${ID}_${name}`
+            return Scratch.vm.runtime.threads.some((thread) => {
+                const block = thread.target && thread.target.blocks.getBlock(thread.topBlock)
+                return block && block.opcode === opcode
+            })
+        }
+
+        _canUseMultiplayer() {
+            return this._canUseBridge() && !!window.bridge.multiplayer
+        }
+
+
         _fireEvent(name) {
-            Scratch.vm.runtime.startHats(`${ID}_${name}`)
+            return Scratch.vm.runtime.startHats(`${ID}_${name}`)
         }
 
         _canUseBridge() {
