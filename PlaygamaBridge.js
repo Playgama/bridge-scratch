@@ -15,6 +15,7 @@
             // multiplayer data exposed through reporters
             this._multiplayerLastError = ''
             this._multiplayerLastRooms = []
+            this._multiplayerLastRegions = []
             this._multiplayerLastPlayer = null
             this._multiplayerLastMessage = null
             this._multiplayerRoomLeftReason = ''
@@ -528,6 +529,11 @@
                         text: 'multiplayer room id'
                     },
                     {
+                        opcode: 'multiplayerRegion',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer region'
+                    },
+                    {
                         opcode: 'multiplayerRoom',
                         blockType: Scratch.BlockType.REPORTER,
                         text: 'multiplayer room JSON'
@@ -786,6 +792,43 @@
                         opcode: 'multiplayerLastRooms',
                         blockType: Scratch.BlockType.REPORTER,
                         text: 'multiplayer last rooms JSON'
+                    },
+                    {
+                        opcode: 'multiplayerGetRegions',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'get multiplayer regions'
+                    },
+                    {
+                        opcode: 'multiplayerRegionListCount',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer regions count'
+                    },
+                    {
+                        opcode: 'multiplayerRegionListId',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer region [INDEX] id',
+                        arguments: {
+                            INDEX: {
+                                type: Scratch.ArgumentType.NUMBER,
+                                defaultValue: 1
+                            }
+                        }
+                    },
+                    {
+                        opcode: 'multiplayerLastRegions',
+                        blockType: Scratch.BlockType.REPORTER,
+                        text: 'multiplayer last regions JSON'
+                    },
+                    {
+                        opcode: 'multiplayerSetRegion',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'set multiplayer region [REGION]',
+                        arguments: {
+                            REGION: {
+                                type: Scratch.ArgumentType.STRING,
+                                defaultValue: ''
+                            }
+                        }
                     },
                     {
                         opcode: 'multiplayerInviteToRoom',
@@ -1555,6 +1598,14 @@
             return window.bridge.multiplayer.roomId || ''
         }
 
+        multiplayerRegion() {
+            if (!this._canUseMultiplayer()) {
+                return ''
+            }
+
+            return window.bridge.multiplayer.region || ''
+        }
+
         multiplayerRoom() {
             if (!this._canUseMultiplayer()) {
                 return ''
@@ -1717,6 +1768,35 @@
 
         multiplayerLastRooms() {
             return this._toJson(this._multiplayerLastRooms)
+        }
+
+        multiplayerGetRegions() {
+            this._multiplayerLastRegions = []
+            return this._multiplayerRequest(
+                () => window.bridge.multiplayer.getRegions(),
+                (regions) => { this._multiplayerLastRegions = regions || [] }
+            )
+        }
+
+        multiplayerRegionListCount() {
+            return this._multiplayerLastRegions.length
+        }
+
+        multiplayerRegionListId(args) {
+            return this._getMultiplayerItem(this._multiplayerLastRegions, args.INDEX) || ''
+        }
+
+        multiplayerLastRegions() {
+            return this._toJson(this._multiplayerLastRegions)
+        }
+
+        // Region of the next created or matched room and of 'get multiplayer rooms'
+        multiplayerSetRegion(args) {
+            if (!this._canUseMultiplayer()) {
+                return
+            }
+
+            window.bridge.multiplayer.setRegion(Scratch.Cast.toString(args.REGION))
         }
 
         multiplayerInviteToRoom(args) {
